@@ -1,4 +1,5 @@
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -227,28 +228,24 @@ public class SalesUser {
 
             //-------- Imparsonate Sales users to - Essex Portals ------------------------------------
 
-            String requestBodyImp  =  "{\n" +
-                    "    \"customerId\": " + selectedRahulId + ",\n" +
-                    "    \"deviceId\": \"6f146c34cbde1d5f604e12d30c5d691cebcf17aa766166d6efb3bb532c997141\",\n" +
-                    "    \"components\": {\n" +
-                    "        \"userAgent\": {\n" +
-                    "            \"value\": \"Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36\"\n" +
-                    "        },\n" +
-                    "        \"language\": {\n" +
-                    "            \"value\": \"en-GB\"\n" +
-                    "        },\n" +
-                    "        \"screenResolution\": {\n" +
-                    "            \"value\": [\n" +
-                    "                953,\n" +
-                    "                845\n" +
-                    "            ]\n" +
-                    "        }\n" +
+            String requestBodyImp  = "{\n" +
+                    "  \"customerId\": 1450,\n" +
+                    "  \"deviceId\": \"6f146c34cbde1d5f604e12d30c5d691cebcf17aa766166d6efb3bb532c997141\",\n" +
+                    "  \"components\": {\n" +
+                    "    \"userAgent\": {\n" +
+                    "      \"value\": \"Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36\"\n" +
+                    "    },\n" +
+                    "    \"language\": {\n" +
+                    "      \"value\": \"en-GB\"\n" +
+                    "    },\n" +
+                    "    \"screenResolution\": {\n" +
+                    "      \"value\": [953, 845]\n" +
                     "    }\n" +
+                    "  }\n" +
                     "}";
-
             // POST request
             Response responseCustomerImp = given()
-                    .header("Content-Type", "application/json")
+                    .contentType(ContentType.JSON)
                     .header("Authorization", "Bearer " + accessToken)
                     .body(requestBodyImp)
                     .log().all()
@@ -261,24 +258,90 @@ public class SalesUser {
                     .response();
 
             // Extract values from JSON
-            System.out.println("Imparsonate Sales users to : 2567");
-            JsonPath jsonCu = responseCustomerImp.jsonPath();
+//            System.out.println("Imparsonate Sales users to : 2567");
+//            JsonPath jsonCu = responseCustomerImp.jsonPath();
+//
+//            if (jsonCu.get("data.token.token") != null) {
+//                tokenImp = jsonCu.getString("data.token.token");
+//                // Output of imparsonate token
+//                System.out.println("Impersonation Token: " + tokenImp);
+//
+//            } else {
+//                System.out.println("Impersonation token is null or missing");
+//            }
+//            String messageCImp = jsonCu.getString("message");
+//            // Output
+//            System.out.println("Message: " + messageCImp);
 
-            if (jsonCu.get("data.token.token") != null) {
-                tokenImp = jsonCu.getString("data.token.token");
-                // Output of imparsonate token
-                System.out.println("Impersonation Token: " + tokenImp);
 
-            } else {
-                System.out.println("Impersonation token is null or missing");
-            }
-            String messageCImp = jsonCu.getString("message");
-            // Output
-            System.out.println("Message: " + messageCImp);
+        // Extract values from JSON response
+         // System.out.println("Impersonate Sales user to: 2567");
+
+        // Parse the response once
+        JsonPath jsonCu = responseCustomerImp.jsonPath();
+
+        // Safely extract the nested impersonation token
+        // String tokenImp = jsonCu.getString("data.token.token");
+          //   if (tokenImp != null && !tokenImp.isEmpty()) {
+               // System.out.println("Impersonation Token: " + tokenImp);
+            //  } else {
+              //   System.out.println("Impersonation token is null or missing");
+            // }
+
+        // Extract the top-level message
+      //  String messageCImp = jsonCu.getString("message");
+    //    System.out.println("Message: " + messageCImp);
+
+        // Optional: extract the inner data.message if you also need it
+//        String innerMessage = jsonCu.getString("data.message");
+//        System.out.println("Inner Message: " + innerMessage);
+
+        String topMessage   = responseCustomerImp.jsonPath().getString("message");
+        String innerMessage = responseCustomerImp.jsonPath().getString("data.message");
+        String impToken     = responseCustomerImp.jsonPath().getString("data.token.token");
+        String otpimp = responseCustomerImp.jsonPath().getString("data.otpCode");
 
 
+        System.out.println("Top-level Message : " + topMessage);   // → "Device already trusted. OTP skipped."
+        System.out.println("Inner Message     : " + innerMessage); // → "Device already trusted. OTP skipped."
+        System.out.println("Impersonation Token: " + impToken);
+        System.out.println("Extracted OTP: " + otpimp);
+
+
+        // Store it wherever you need
+        System.out.println("Extracted OTP: " + otpCode);
         //OTP for imparsonation not needed as because its remembered --- Otp skipped
         // Write down the Otp for imparsonation later //
+
+ //------- imp Otp verification ------------------------------------//
+
+        String impOtpverifyBody = "{\n" +
+                "  \"email\": \"rahul.mathur@codeclouds.in\",\n" +
+                "  \"otp\": \"" + otpimp + "\",\n" +
+                "  \"customerId\": 1450,\n" +
+                "  \"rememberMe\": false,\n" +
+                "  \"deviceId\": \"bcc6990218bdb1cc23e779cd21280105fb384304197dd87c1fe8ba8826a8b2ff\",\n" +
+                "  \"components\": {\n" +
+                "    \"browser\": \"Chrome\",\n" +
+                "    \"os\": \"Windows\"\n" +
+                "  }\n" +
+                "}";
+        Response impOtpVerifyRes = RestAssured
+                .given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + accessToken)
+                .body(impOtpverifyBody)
+                .log().all()
+                .when()
+                .post("/customer-impersonate/impersonate/verify-otp")
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        String impersonateToken = impOtpVerifyRes.jsonPath().getString("data.token");
+        System.out.println("Impersonate Token after verifying otp: " + impersonateToken);
 
 //--------------------- Swell Cart API - Add to Cart --------------------- //
         //Product add To cart

@@ -28,11 +28,17 @@ Feature: Login with sales user and getting the company list for assigned company
     And I extract the total number of mapped customers
     And I loop through the customer records and print details
     And I store the first customer record for impersonation
-    When I impersonate the first customer with device and component details
-    Then the impersonation response status code should be 200
-#    And the impersonation token should be present
-    And the impersonation message should be printed
-    And I verify the impersonation details
+      # And the impersonation token extraction using otp from response saving the token
+    When I impersonate the customer under Essex Brownell company
+    Then I have received imparsonation otp and message
+    When I verify the impersonation otp for the customer
+    Then I should get a imparsonation access token and message
+
+
+    #    When I impersonate the first customer with device and component details
+#    Then the impersonation response status code should be 200
+#    And the impersonation message should be printed
+#    And I verify the impersonation details
 
 
 #Scenario: As a sales user I can impersonate the Rahul customer under Essex Brownell company.

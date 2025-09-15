@@ -13,6 +13,7 @@ public class TestContext {
 
     private String impersonationToken;
     private String impersonationMessage;
+    private String impersonationOtp;
 
     public String getAccessToken() {
         return accessToken;
@@ -73,4 +74,15 @@ public class TestContext {
     public String getImpersonationMessage() {
         return impersonationMessage;
     }
+
+    /** Retrieve the stored impersonation otp */
+    public void SetImpersonationOtp(String impersonationOtp) {
+        this.impersonationOtp = impersonationOtp;
+    }
+
+    public String GetImpersonationOtp() {
+        return impersonationOtp;
+    }
+
+
 }

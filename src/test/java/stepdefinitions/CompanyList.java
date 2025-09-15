@@ -5,6 +5,8 @@ import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 
@@ -191,7 +193,7 @@ public void i_checking_the_customer_list_for_essex_brownell(DataTable dataTable)
         System.out.println(customerId + " " + swellId + " " + email);
 
         String requestBody = "{\n" +
-                "    \"customerId\": " + customerId + ",\n" +
+                "    \"customerId\": " + 2567 + ",\n" +
                 "    \"deviceId\": \"6f146c34cbde1d5f604e12d30c5d691cebcf17aa766166d6efb3bb532c997141\",\n" +
                 "    \"components\": {\n" +
                 "        \"userAgent\": {\n" +
@@ -246,4 +248,102 @@ public void i_checking_the_customer_list_for_essex_brownell(DataTable dataTable)
         System.out.println("Stored Token: " + context.getImpersonationToken());
         System.out.println("Stored Message: " + context.getImpersonationMessage());
     }
+
+    @When("I impersonate the customer under Essex Brownell company")
+    public void iImpersonateTheCustomerUnderEssexBrownellCompany() {
+        String token = context.getAccessToken();
+        String requestBodyImp  = "{\n" +
+                "  \"customerId\": 1450,\n" +
+                "  \"deviceId\": \"6f146c34cbde1d5f604e12d30c5d691cebcf17aa766166d6efb3bb532c997141\",\n" +
+                "  \"components\": {\n" +
+                "    \"userAgent\": {\n" +
+                "      \"value\": \"Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36\"\n" +
+                "    },\n" +
+                "    \"language\": {\n" +
+                "      \"value\": \"en-GB\"\n" +
+                "    },\n" +
+                "    \"screenResolution\": {\n" +
+                "      \"value\": [953, 845]\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+        // POST request
+        Response responseCustomerImp = given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .body(requestBodyImp)
+                .log().all()
+                .when()
+                .post("/customer-impersonate")
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        String topMessage   = responseCustomerImp.jsonPath().getString("message");
+        String otpimp = responseCustomerImp.jsonPath().getString("data.otpCode");
+        context.setImpersonationMessage(topMessage);
+        context.SetImpersonationOtp(otpimp);
+
+        System.out.println("Top-level Message : " + context.getImpersonationMessage());   // → "Device already trusted. OTP skipped."// → "Device already trusted. OTP skipped."
+        System.out.println("Extracted OTP     : " + context.GetImpersonationOtp());
+
+    }
+
+    @Then("I have received imparsonation otp and message")
+    public void iHaveReceivedImparsonationOtpAndMessage() {
+        String message = context.getImpersonationMessage();
+        String otp     = context.GetImpersonationOtp();
+        System.out.println("Top-level Message : " + message);
+        System.out.println("Extracted OTP     : " + otp);
+        assertEquals("Expected message to be 'OTP sent successfully'","OTP sent successfully",context.getImpersonationMessage());
+        // ✅ (Optional) Ensure OTP is not null or empty
+        if (otp == null || otp.trim().isEmpty()) {
+            throw new AssertionError("Imparsonation OTP is missing or empty");
+        }
+    }
+
+    @When("I verify the impersonation otp for the customer")
+    public void iVerifyTheImpersonationOtpForTheCustomer() {
+        String token = context.getAccessToken();
+        String otpImp = context.GetImpersonationOtp();
+
+        String impOtpverifyBody = "{\n" +
+                "  \"email\": \"rahul.mathur@codeclouds.in\",\n" +
+                "  \"otp\": \"" + otpImp + "\",\n" +
+                "  \"customerId\": 1450,\n" +
+                "  \"rememberMe\": false,\n" +
+                "  \"deviceId\": \"bcc6990218bdb1cc23e779cd21280105fb384304197dd87c1fe8ba8826a8b2ff\",\n" +
+                "  \"components\": {\n" +
+                "    \"browser\": \"Chrome\",\n" +
+                "    \"os\": \"Windows\"\n" +
+                "  }\n" +
+                "}";
+        Response impOtpVerifyRes = RestAssured
+                .given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .body(impOtpverifyBody)
+                .log().all()
+                .when()
+                .post("/customer-impersonate/impersonate/verify-otp")
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        String impersonateToken = impOtpVerifyRes.jsonPath().getString("data.token");
+        context.setImpersonationToken(impersonateToken);
+        System.out.println("Impersonate Token after verifying otp: " + context.getImpersonationToken());
+    }
+
+
+    @Then("I should get a imparsonation access token and message")
+    public void iShouldGetAImparsonationAccessTokenAndMessage() {
+        System.out.println("Impersonate Token after verifying otp:" + context.getImpersonationToken());
+    }
+
+
 }
