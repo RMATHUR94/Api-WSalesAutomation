@@ -1,6 +1,7 @@
 package stepdefinitions;
 
 import Utils.RoleManager;
+import Utils.TestContext;
 import endPoints.Authapi;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -14,15 +15,23 @@ public class LoginSteps {
 
     private String token;
     private Response logoutResponse;
+    private final TestContext context;
+
+    // PicoContainer will inject TestContext here
+    public LoginSteps(TestContext context) {
+        this.context = context;
+    }
 
     @Given("I login as {string}")
     public void i_login_as_role(String role) {
         token = RoleManager.getAccessToken(role);
+        context.setAccessToken(token);
         System.out.println("✅ Logged in as " + role + " | Access Token: " + token);
     }
 
     @Then("I should get a valid access token")
     public void i_should_get_a_valid_access_token() {
+        String token = context.getAccessToken();
         assertNotNull(token, "❌ Token should not be null");
         assertFalse(token.isEmpty(), "❌ Token should not be empty");
     }

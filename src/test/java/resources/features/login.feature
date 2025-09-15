@@ -11,3 +11,4 @@ Feature: Login and Logout for multiple roles
       | "sales"    |
       | "admin"    |
       | "accountman" |
+
