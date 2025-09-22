@@ -18,7 +18,7 @@ Feature: Login with sales user and getting the company list for assigned company
     And I extract the meta information from the response
 
 
-  Scenario: As a sales user I can impersonate the Rahul customer under Essex Brownell company.
+  Scenario: As a sales user I can impersonate a customer named Rahul Mathur from Essex Brownell company and able to place a final order on the storefront/mother portal.
     When I checking the customer list for Essex Brownell
       | search        |            |
       | type          | individual |
@@ -33,6 +33,13 @@ Feature: Login with sales user and getting the company list for assigned company
     Then I have received imparsonation otp and message
     When I verify the impersonation otp for the customer
     Then I should get a imparsonation access token and message
+    Given When I add a product to the cart on storefront as an impersonated user
+    Then The status code should be 200 and show the message
+    When final order placement on storefront as an impersonated user
+    Then final order status code should be 200 and show the message
+
+
+
 
 
     #    When I impersonate the first customer with device and component details

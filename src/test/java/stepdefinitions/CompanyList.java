@@ -1,14 +1,19 @@
 package stepdefinitions;
 
+import Utils.RequestSpec;
 import Utils.TestContext;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+
+import org.testng.asserts.SoftAssert;
 
 import java.util.Map;
 
@@ -25,7 +30,10 @@ public class CompanyList {
     private JsonPath customerListJsonPath;
     private JsonPath jsonPathList;
     private Response impersonationResponse;
-    private String impersonationToken;
+
+
+    private RequestSpecification requestSwellcart;
+    private Response responseFinalOrder;
 
     public CompanyList(TestContext context) {
         this.context = context;
@@ -39,6 +47,7 @@ public class CompanyList {
 
         String token = context.getAccessToken();
         customerListResponse = given()
+                .spec(RequestSpec.get())
                 .header("Authorization", "Bearer " + token)
                 .queryParam("page", params.get("page"))
                 .queryParam("limit", params.get("limit"))
@@ -110,6 +119,7 @@ public void i_checking_the_customer_list_for_essex_brownell(DataTable dataTable)
             String token = context.getAccessToken();
             Map<String, String> params = dataTable.asMap(String.class, String.class);
         customerListResponse = given()
+                .spec(RequestSpec.get())
                 .header("Authorization", "Bearer " + token)
                 .queryParams(params)
                 .header("Content-Type", "application/json")
@@ -209,6 +219,7 @@ public void i_checking_the_customer_list_for_essex_brownell(DataTable dataTable)
                 "}";
 
         impersonationResponse = given()
+                .spec(RequestSpec.get())
                 .header("Authorization", "Bearer " + token)
                 .header("Content-Type", "application/json")
                 .body(requestBody)
@@ -269,6 +280,7 @@ public void i_checking_the_customer_list_for_essex_brownell(DataTable dataTable)
                 "}";
         // POST request
         Response responseCustomerImp = given()
+                .spec(RequestSpec.get())
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + token)
                 .body(requestBodyImp)
@@ -322,6 +334,7 @@ public void i_checking_the_customer_list_for_essex_brownell(DataTable dataTable)
                 "}";
         Response impOtpVerifyRes = RestAssured
                 .given()
+                .spec(RequestSpec.get())
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .body(impOtpverifyBody)
@@ -345,5 +358,204 @@ public void i_checking_the_customer_list_for_essex_brownell(DataTable dataTable)
         System.out.println("Impersonate Token after verifying otp:" + context.getImpersonationToken());
     }
 
+
+    @Given("When I add a product to the cart on storefront as an impersonated user")
+    public void whenIAddAProductToTheCartOnStorefrontAsAnImpersonatedUser() {
+        //Product add To cart
+        String addToCart = "{\n" +
+                "    \"account_id\": \"6874d2ea057c0400125023ee\",\n" +
+                "    \"items\": {\n" +
+                "        \"product_id\": \"65cf531b86565000124b1814\",\n" +
+                "        \"quantity\": 1,\n" +
+                "        \"shipment_location\": \"\",\n" +
+                "        \"sku\": \"DC-Q2-3233-50\",\n" +
+                "        \"image\": \"https://cdn.swell.store/essex-brownell_test/65d249df475cc50012c2e0c8/8c72f8b039788dd1ca3d469011276303/essex-brownell-dupont-molykote_1_90.png\",\n" +
+                "        \"back_order\": true,\n" +
+                "        \"lead_time\": \"24\",\n" +
+                "        \"slug\": \"q2-3233-bouncing-putty-50-lb-226-kg-box\",\n" +
+                "        \"qad_price\": {\n" +
+                "            \"sku\": \"DC-Q2-3233-50\",\n" +
+                "            \"base_price\": 1887.91,\n" +
+                "            \"qty\": 0,\n" +
+                "            \"metal_price\": 0,\n" +
+                "            \"differential_price\": 0,\n" +
+                "            \"surcharge_price\": 0,\n" +
+                "            \"freight_price\": 0,\n" +
+                "            \"package_price\": 0,\n" +
+                "            \"pallet_price\": 0,\n" +
+                "            \"metal_adder_price\": 0,\n" +
+                "            \"success\": true,\n" +
+                "            \"error\": false,\n" +
+                "            \"site_inventory\": [\n" +
+                "                {\n" +
+                "                    \"site\": 412,\n" +
+                "                    \"site_name\": \"Denver\",\n" +
+                "                    \"site_state\": \"CO\",\n" +
+                "                    \"qty\": 0\n" +
+                "                }\n" +
+                "            ]\n" +
+                "        },\n" +
+                "        \"price\": 1887.91,\n" +
+                "        \"moq\": \"1\",\n" +
+                "        \"min_quantity_increment\": \"1\",\n" +
+                "        \"show_differential_price\": false,\n" +
+                "        \"category_id\": \"65cb57f2e1c8600012f6acb4\"\n" +
+                "    },\n" +
+                "    \"cart_id\": \"68825f21b158c30012f92761\"\n" +
+                "}";
+
+                requestSwellcart = RestAssured
+                .given()
+                .baseUri("https://dev.d35iy77kbiv1w7.amplifyapp.com")
+                .basePath("/api/swell/revalidate/cart")
+                .header("Content-Type", "application/json")
+                .body(addToCart)
+                .log().all();
+
+
+    }
+
+    @Then("The status code should be {int} and show the message")
+    public void theStatusCodeShouldBeAndShowTheMessage(int arg0) {
+        Response response = requestSwellcart
+                .when().log().all()
+                .post();
+
+        int statusCode = response.getStatusCode();
+        JsonPath jsonPathswel = response.jsonPath();
+        boolean swellStatus = jsonPathswel.getBoolean("status");
+        String message2 = jsonPathswel.getString("msg");
+
+        System.out.println("Status Code: " + statusCode);
+        System.out.println("Status Flag: " + swellStatus);
+        System.out.println("Message: " + message2);
+    }
+
+    @When("final order placement on storefront as an impersonated user")
+    public void finalOrderPlacementOnStorefrontAsAnImpersonatedUser() {
+       String impToken = context.getImpersonationToken();
+        String BodyFinalOrder = "{\n" +
+                "  \"shipping\": {\n" +
+                "    \"zip\": \"53216-1708\",\n" +
+                "    \"state\": \"WI\",\n" +
+                "    \"address1\": \"4170 N 35TH STREET Suote A, \\n, \\n\",\n" +
+                "    \"city\": \"MILWAUKEE\",\n" +
+                "    \"country\": \"US\",\n" +
+                "    \"first_name\": \"Essex Brownell Company\",\n" +
+                "    \"last_name\": null,\n" +
+                "    \"name\": \"Essex Brownell Company\",\n" +
+                "    \"id\": \"bill_6874d2ea057c0400125023ee\"\n" +
+                "  },\n" +
+                "  \"billing\": {\n" +
+                "    \"zip\": \"53216-1708\",\n" +
+                "    \"state\": \"WI\",\n" +
+                "    \"address1\": \"4170 N 35TH STREET Suote A, \\n, \\n\",\n" +
+                "    \"city\": \"MILWAUKEE\",\n" +
+                "    \"country\": \"US\",\n" +
+                "    \"first_name\": \"Essex Brownell Company\",\n" +
+                "    \"last_name\": null,\n" +
+                "    \"name\": \"Essex Brownell Company\",\n" +
+                "    \"id\": \"bill_6874d2ea057c0400125023ee\"\n" +
+                "  },\n" +
+                "  \"items\": [\n" +
+                "    {\n" +
+                "      \"product_id\": \"65cf531b86565000124b1814\",\n" +
+                "      \"quantity\": 1,\n" +
+                "      \"site_id\": \"412\",\n" +
+                "      \"shipment_location\": \"Denver, CO\",\n" +
+                "      \"sku\": \"DC-Q2-3233-50\",\n" +
+                "      \"image\": \"https://cdn.swell.store/essex-brownell_test/65d249df475cc50012c2e0c8/8c72f8b039788dd1ca3d469011276303/essex-brownell-dupont-molykote_1_90.png\",\n" +
+                "      \"qad_price\": {\n" +
+                "        \"sku\": \"DC-Q2-3233-50\",\n" +
+                "        \"base_price\": 1887.91,\n" +
+                "        \"qty\": 0,\n" +
+                "        \"metal_price\": 0,\n" +
+                "        \"differential_price\": 0,\n" +
+                "        \"surcharge_price\": 0,\n" +
+                "        \"freight_price\": 0,\n" +
+                "        \"package_price\": 0,\n" +
+                "        \"pallet_price\": 0,\n" +
+                "        \"metal_adder_price\": 0,\n" +
+                "        \"success\": true,\n" +
+                "        \"error\": false,\n" +
+                "        \"site_inventory\": [\n" +
+                "          {\n" +
+                "            \"site\": 412,\n" +
+                "            \"site_name\": \"Denver\",\n" +
+                "            \"site_state\": \"CO\",\n" +
+                "            \"qty\": 0\n" +
+                "          }\n" +
+                "        ]\n" +
+                "      },\n" +
+                "      \"show_differential_price\": false,\n" +
+                "      \"slug\": \"q2-3233-bouncing-putty-50-lb-226-kg-box\",\n" +
+                "      \"lead_time\": \"24\",\n" +
+                "      \"back_order\": true,\n" +
+                "      \"moq\": \"1\",\n" +
+                "      \"min_quantity_increment\": \"1\",\n" +
+                "      \"category_id\": \"65cb57f2e1c8600012f6acb4\",\n" +
+                "      \"options\": [\n" +
+                "        {\n" +
+                "          \"values\": \"412\",\n" +
+                "          \"name\": \"warehouse\",\n" +
+                "          \"id\": \"66a8dc152fd56f0012773fce\"\n" +
+                "        }\n" +
+                "      ],\n" +
+                "      \"sale_price\": 1887.91,\n" +
+                "      \"price\": 1887.91,\n" +
+                "      \"differential_price\": 0,\n" +
+                "      \"product_original_price\": 1887.91,\n" +
+                "      \"id\": \"68850cb65d8cdf001211ca87\",\n" +
+                "      \"orig_price\": 0,\n" +
+                "      \"delivery\": \"shipment\",\n" +
+                "      \"shipment_weight\": 0,\n" +
+                "      \"price_total\": \"1887.91\",\n" +
+                "      \"discount_total\": 0,\n" +
+                "      \"discount_each\": 0,\n" +
+                "      \"tax_total\": 0,\n" +
+                "      \"tax_each\": 0,\n" +
+                "      \"category_index\": [],\n" +
+                "      \"discounts\": []\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"purchase_order_number\": \"Final order\",\n" +
+                "  \"company_id\": \"65df068605226f001269bf30\",\n" +
+                "  \"storedImpersonateToken\": \"" + impToken + "\"\n" +
+                "}";
+
+                 responseFinalOrder = RestAssured
+                .given().spec(RequestSpec.get())
+                .baseUri("https://dev.d35iy77kbiv1w7.amplifyapp.com")
+                .basePath("/api/swell/revalidate/order")
+                .queryParam("secret", "ABDC")
+                .queryParam("account_id", "6874d2ea057c0400125023ee")
+                .header("Content-Type", "application/json")
+                .body(BodyFinalOrder)
+                .log().all()
+                .post();
+    }
+
+    @Then("final order status code should be {int} and show the message")
+    public void finalOrderStatusCodeShouldBeAndShowTheMessage(int expectedCode) {
+        int actualCode = responseFinalOrder.getStatusCode();
+        SoftAssert soft = new SoftAssert();
+        soft.assertEquals(actualCode, expectedCode, "Unexpected HTTP status code");
+
+        // -------- Extract and print details --------
+        JsonPath jp = responseFinalOrder.jsonPath();
+        boolean statusFlag = jp.getBoolean("status");
+        String msg = jp.getString("msg");
+        String orderId = jp.getString("results.id");
+
+        System.out.println("Status Code : " + actualCode);
+        System.out.println("Status Flag : " + statusFlag);
+        System.out.println("Message     : " + msg);
+        System.out.println("Order ID    : " + orderId);
+
+        // Optional additional validations
+        soft.assertNotNull(orderId, "Order ID should not be null");
+
+        soft.assertAll();
+    }
 
 }

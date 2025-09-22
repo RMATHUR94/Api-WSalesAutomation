@@ -5,6 +5,7 @@ import Pojo.LoginReq;
 import Pojo.LoginRes;
 import Pojo.VerifyOtpRes;
 import Utils.ConfigReader;
+import Utils.RequestSpec;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -29,10 +30,16 @@ public class Authapi extends BaseApi {
         loginReq.setRememberMe(false);
         loginReq.setDeviceId(ConfigReader.getGlobalValue(role + ".deviceId"));
 
-        RequestSpecification loginRequest = given().log().all().spec(req)
-                .body(loginReq);
+        return given()
+                .spec(RequestSpec.get())   // ✅ use shared spec
+                .body(loginReq)
+                .when()
+                .post("/auth/login")
+                .then()
+                .extract()
+                .as(LoginRes.class);
 
-        return  loginRequest.when().post("/auth/login").then().extract().response().as(LoginRes.class);
+
 
     }
 
@@ -43,8 +50,8 @@ public class Authapi extends BaseApi {
         requestBody.put("deviceId", ConfigReader.getGlobalValue(role + ".deviceId"));
         requestBody.put("rememberMe", false);
 
-        return given().log().all()
-                .contentType(ContentType.JSON)
+        return given()
+                .spec(RequestSpec.get())   // ✅ reuse spec
                 .body(requestBody)
                 .when()
                 .post("/auth/verify-otp")
@@ -59,8 +66,7 @@ public class Authapi extends BaseApi {
         requestBody.put("refreshToken", AccessToken);
 
         return given()
-                .log().all()
-                .spec(req)
+                .spec(RequestSpec.get())   // ✅ reuse spec
                 .body(requestBody)
                 .when()
                 .post("/auth/logout")

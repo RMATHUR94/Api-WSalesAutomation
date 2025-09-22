@@ -1,4 +1,4 @@
-Feature: Login and Logout for multiple roles
+Feature: Login and Logout for multiple roles : Admin, Sales, Accountmanager with valid credentials
 
   Scenario Outline: Login and logout flow for roles
     Given I login as <role>
