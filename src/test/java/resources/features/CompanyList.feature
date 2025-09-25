@@ -41,7 +41,6 @@ Feature: Login with sales user and getting the company list for assigned company
 
 
 
-
     #    When I impersonate the first customer with device and component details
 #    Then the impersonation response status code should be 200
 #    And the impersonation message should be printed

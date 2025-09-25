@@ -1,6 +1,7 @@
 package Utils;
 
 
+import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -11,6 +12,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Holds a single reusable RequestSpecification for the entire project.
@@ -24,7 +27,9 @@ public class RequestSpec {
         PrintStream logStream;
         try {
             // ✅ Create/overwrite the log file (inside target/logs or any folder you like)
-            File logFile = new File("target/api-log.txt");
+            String time = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            File logFile = new File("target/api-log-" + time + ".txt");
+            //File logFile = new File("target/api-log.txt");
             logFile.getParentFile().mkdirs();  // ensure folder exists
            // logStream = new PrintStream(new FileOutputStream(logFile, true)); // its appeding whole one by one every logs.
             logStream = new PrintStream(new FileOutputStream(logFile));
@@ -46,6 +51,44 @@ public class RequestSpec {
             throw new IllegalStateException("RequestSpec not initialized or null");
         }
         return spec;
+    }
+
+    /**
+     * Centralized base request with Authorization and JSON content-type.
+     * Use this for most API calls that need Bearer token + base spec.
+     */
+    public static RequestSpecification baseRequest(String token) {
+        // We start from the already-built spec so it keeps the file-logging filters
+        return RestAssured.given()
+                .spec(get())                                 // keep baseUri + filters + contentType
+                .header("Authorization", "Bearer " + token)  // dynamic auth header
+                .contentType(ContentType.JSON)               // explicit JSON (overrides if needed)
+                .log().all();                                // optional extra console log
+    }
+
+    /**
+     * Request builder for Swell storefront (different baseUri).
+     * Use when you must hit the amplifyapp host in your steps.
+     */
+    public static RequestSpecification swellRequest() {
+        return RestAssured.given()
+                .baseUri("https://dev.d35iy77kbiv1w7.amplifyapp.com")
+                .contentType(ContentType.JSON)
+                .log().all();
+    }
+
+    /**
+     * Optional helper to post JSON and extract response in one go.
+     * Keeps step defs slimmer.
+     */
+    public static io.restassured.response.Response postJson(String endpoint, String token, String body) {
+        return baseRequest(token)
+                .body(body)
+                .when()
+                .post(endpoint)
+                .then()
+                .log().all()
+                .extract().response();
     }
 
 }

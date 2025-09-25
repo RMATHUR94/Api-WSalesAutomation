@@ -30,8 +30,6 @@ public class CompanyList {
     private JsonPath customerListJsonPath;
     private JsonPath jsonPathList;
     private Response impersonationResponse;
-
-
     private RequestSpecification requestSwellcart;
     private Response responseFinalOrder;
 
@@ -46,16 +44,14 @@ public class CompanyList {
         Map<String, String> params = dataTable.asMap(String.class, String.class);
 
         String token = context.getAccessToken();
-        customerListResponse = given()
-                .spec(RequestSpec.get())
-                .header("Authorization", "Bearer " + token)
+
+        customerListResponse = RequestSpec.baseRequest(token)
                 .queryParam("page", params.get("page"))
                 .queryParam("limit", params.get("limit"))
                 .queryParam("search", params.get("search"))
                 .queryParam("type", params.get("type"))
                 .queryParam("sortBy", params.get("sortBy"))
                 .queryParam("sortOrder", params.get("sortOrder"))
-                .log().all()
                 .when()
                 .get("/customers")
                 .then()
@@ -108,7 +104,6 @@ public class CompanyList {
     public void i_extract_the_meta_information_from_the_response() {
         int totalItems = jsonPathList.getInt("meta.totalItems");
         String salesUserName = jsonPathList.getString("meta.salesUserName");
-
         System.out.println("Total Items: " + totalItems);
         System.out.println("Sales User: " + salesUserName);
     }
@@ -218,18 +213,14 @@ public void i_checking_the_customer_list_for_essex_brownell(DataTable dataTable)
                 "    }\n" +
                 "}";
 
-        impersonationResponse = given()
-                .spec(RequestSpec.get())
-                .header("Authorization", "Bearer " + token)
-                .header("Content-Type", "application/json")
-                .body(requestBody)
-                .log().all()
-                .when()
-                .post("/customer-impersonate")
-                .then()
-                .log().all()
-                .extract()
-                .response();
+            impersonationResponse = RequestSpec.baseRequest(token)
+                    .body(requestBody)
+                    .when()
+                    .post("/customer-impersonate")
+                    .then()
+                    .log().all()
+                    .extract()
+                    .response();
 
         context.setLastResponse(impersonationResponse);
     }
@@ -279,12 +270,8 @@ public void i_checking_the_customer_list_for_essex_brownell(DataTable dataTable)
                 "  }\n" +
                 "}";
         // POST request
-        Response responseCustomerImp = given()
-                .spec(RequestSpec.get())
-                .contentType(ContentType.JSON)
-                .header("Authorization", "Bearer " + token)
+        Response responseCustomerImp = RequestSpec.baseRequest(token)
                 .body(requestBodyImp)
-                .log().all()
                 .when()
                 .post("/customer-impersonate")
                 .then()
@@ -332,11 +319,10 @@ public void i_checking_the_customer_list_for_essex_brownell(DataTable dataTable)
                 "    \"os\": \"Windows\"\n" +
                 "  }\n" +
                 "}";
-        Response impOtpVerifyRes = RestAssured
+
+        Response impOtpVerifyRes =  RestAssured
                 .given()
-                .spec(RequestSpec.get())
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token)
+                .spec(RequestSpec.baseRequest(token))
                 .body(impOtpverifyBody)
                 .log().all()
                 .when()
@@ -346,6 +332,7 @@ public void i_checking_the_customer_list_for_essex_brownell(DataTable dataTable)
                 .statusCode(200)
                 .extract()
                 .response();
+
 
         String impersonateToken = impOtpVerifyRes.jsonPath().getString("data.token");
         context.setImpersonationToken(impersonateToken);
@@ -404,11 +391,8 @@ public void i_checking_the_customer_list_for_essex_brownell(DataTable dataTable)
                 "    \"cart_id\": \"68825f21b158c30012f92761\"\n" +
                 "}";
 
-                requestSwellcart = RestAssured
-                .given()
-                .baseUri("https://dev.d35iy77kbiv1w7.amplifyapp.com")
+                requestSwellcart = RequestSpec.swellRequest()
                 .basePath("/api/swell/revalidate/cart")
-                .header("Content-Type", "application/json")
                 .body(addToCart)
                 .log().all();
 
@@ -533,6 +517,8 @@ public void i_checking_the_customer_list_for_essex_brownell(DataTable dataTable)
                 .body(BodyFinalOrder)
                 .log().all()
                 .post();
+
+
     }
 
     @Then("final order status code should be {int} and show the message")
