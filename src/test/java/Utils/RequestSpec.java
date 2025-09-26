@@ -71,7 +71,7 @@ public class RequestSpec {
      * Use when you must hit the amplifyapp host in your steps.
      */
     public static RequestSpecification swellRequest() {
-        return RestAssured.given()
+        return RestAssured.given().spec(get())
                 .baseUri("https://dev.d35iy77kbiv1w7.amplifyapp.com")
                 .contentType(ContentType.JSON)
                 .log().all();

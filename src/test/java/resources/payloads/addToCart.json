@@ -1,0 +1,41 @@
+{
+  "account_id": "6874d2ea057c0400125023ee",
+  "items": {
+    "product_id": "65cf531b86565000124b1814",
+    "quantity": 1,
+    "shipment_location": "",
+    "sku": "DC-Q2-3233-50",
+    "image": "https://cdn.swell.store/essex-brownell_test/65d249df475cc50012c2e0c8/8c72f8b039788dd1ca3d469011276303/essex-brownell-dupont-molykote_1_90.png",
+    "back_order": true,
+    "lead_time": "24",
+    "slug": "q2-3233-bouncing-putty-50-lb-226-kg-box",
+    "qad_price": {
+      "sku": "DC-Q2-3233-50",
+      "base_price": 1887.91,
+      "qty": 0,
+      "metal_price": 0,
+      "differential_price": 0,
+      "surcharge_price": 0,
+      "freight_price": 0,
+      "package_price": 0,
+      "pallet_price": 0,
+      "metal_adder_price": 0,
+      "success": true,
+      "error": false,
+      "site_inventory": [
+        {
+          "site": 412,
+          "site_name": "Denver",
+          "site_state": "CO",
+          "qty": 0
+        }
+      ]
+    },
+    "price": 1887.91,
+    "moq": "1",
+    "min_quantity_increment": "1",
+    "show_differential_price": false,
+    "category_id": "65cb57f2e1c8600012f6acb4"
+  },
+  "cart_id": "68825f21b158c30012f92761"
+}

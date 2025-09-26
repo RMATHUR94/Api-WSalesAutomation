@@ -1,0 +1,88 @@
+{
+  "shipping": {
+    "zip": "53216-1708",
+    "state": "WI",
+    "address1": "4170 N 35TH STREET Suote A, \n, \n",
+    "city": "MILWAUKEE",
+    "country": "US",
+    "first_name": "Essex Brownell Company",
+    "last_name": null,
+    "name": "Essex Brownell Company",
+    "id": "bill_6874d2ea057c0400125023ee"
+  },
+  "billing": {
+    "zip": "53216-1708",
+    "state": "WI",
+    "address1": "4170 N 35TH STREET Suote A, \n, \n",
+    "city": "MILWAUKEE",
+    "country": "US",
+    "first_name": "Essex Brownell Company",
+    "last_name": null,
+    "name": "Essex Brownell Company",
+    "id": "bill_6874d2ea057c0400125023ee"
+  },
+  "items": [
+    {
+      "product_id": "65cf531b86565000124b1814",
+      "quantity": 1,
+      "site_id": "412",
+      "shipment_location": "Denver, CO",
+      "sku": "DC-Q2-3233-50",
+      "image": "https://cdn.swell.store/essex-brownell_test/65d249df475cc50012c2e0c8/8c72f8b039788dd1ca3d469011276303/essex-brownell-dupont-molykote_1_90.png",
+      "qad_price": {
+        "sku": "DC-Q2-3233-50",
+        "base_price": 1887.91,
+        "qty": 0,
+        "metal_price": 0,
+        "differential_price": 0,
+        "surcharge_price": 0,
+        "freight_price": 0,
+        "package_price": 0,
+        "pallet_price": 0,
+        "metal_adder_price": 0,
+        "success": true,
+        "error": false,
+        "site_inventory": [
+          {
+            "site": 412,
+            "site_name": "Denver",
+            "site_state": "CO",
+            "qty": 0
+          }
+        ]
+      },
+      "show_differential_price": false,
+      "slug": "q2-3233-bouncing-putty-50-lb-226-kg-box",
+      "lead_time": "24",
+      "back_order": true,
+      "moq": "1",
+      "min_quantity_increment": "1",
+      "category_id": "65cb57f2e1c8600012f6acb4",
+      "options": [
+        {
+          "values": "412",
+          "name": "warehouse",
+          "id": "66a8dc152fd56f0012773fce"
+        }
+      ],
+      "sale_price": 1887.91,
+      "price": 1887.91,
+      "differential_price": 0,
+      "product_original_price": 1887.91,
+      "id": "68850cb65d8cdf001211ca87",
+      "orig_price": 0,
+      "delivery": "shipment",
+      "shipment_weight": 0,
+      "price_total": "1887.91",
+      "discount_total": 0,
+      "discount_each": 0,
+      "tax_total": 0,
+      "tax_each": 0,
+      "category_index": [],
+      "discounts": []
+    }
+  ],
+  "purchase_order_number": "Final order",
+  "company_id": "65df068605226f001269bf30",
+  "storedImpersonateToken": "impToken"
+}
