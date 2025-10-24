@@ -78,7 +78,7 @@
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-junit</artifactId>
       <version>${cucumber.version}</version>
-      <scope>test</scope>
+<!--      <scope>test</scope>-->
     </dependency>
 
     <!-- Cucumber TestNG (optional: if you want TestNG Runner) -->
@@ -95,5 +95,65 @@
       <artifactId>cucumber-picocontainer</artifactId>
       <version>${cucumber.version}</version>
     </dependency>
+
+    <!-- https://mvnrepository.com/artifact/net.masterthought/maven-cucumber-reporting -->
+    <dependency>
+      <groupId>net.masterthought</groupId>
+      <artifactId>maven-cucumber-reporting</artifactId>
+      <version>5.9.0</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/com.aventstack/extentreports -->
+    <dependency>
+      <groupId>com.aventstack</groupId>
+      <artifactId>extentreports</artifactId>
+      <version>5.1.2</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/tech.grasshopper/extentreports-cucumber7-adapter -->
+    <dependency>
+      <groupId>tech.grasshopper</groupId>
+      <artifactId>extentreports-cucumber7-adapter</artifactId>
+      <version>1.14.0</version>
+    </dependency>
+
   </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Surefire plugin to run tests -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <includes>
+            <include>**/TestRunner*.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+        <plugin>
+          <groupId>net.masterthought</groupId>
+          <artifactId>maven-cucumber-reporting</artifactId>
+          <version>5.9.0</version>
+          <executions>
+            <execution>
+              <id>generate-cucumber-reports</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>generate</goal>
+              </goals>
+              <configuration>
+                <projectName>EBSales API Automation</projectName>
+                <outputDirectory>${project.build.directory}/cucumber-report</outputDirectory>
+                <jsonFiles>
+                  <param>${project.build.directory}/cucumber-report/cucumber.json</param>
+                </jsonFiles>
+                <buildNumber>1</buildNumber>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        </plugins>
+  </build>
 </project>

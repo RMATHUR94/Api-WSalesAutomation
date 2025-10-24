@@ -9,13 +9,7 @@ Feature: Login into Mother portal
 
     Examples:
       | username        |password|
-      | abc123@cc.com   | 123@qwe |
+      | rahul.mathur@codeclouds.in   | cispl123 |
 
 
 
-
-    When Store and Verify the <Id> maps to "<name>" from customer_list Api
-
-    Examples:
-      | name     |Id     |
-      | Rahul    | 2467  |

@@ -3,7 +3,6 @@ Feature: Login with sales user and getting the company list for assigned company
   Background:
     Given I login as "sales"
     Then I should get a valid access token
-
   Scenario: Fetch company list under a sales user
     When I request the company list with parameters
       | page      | 1        |
@@ -37,7 +36,6 @@ Feature: Login with sales user and getting the company list for assigned company
     Then The status code should be 200 and show the message
     When final order placement on storefront as an impersonated user
     Then final order status code should be 200 and show the message
-
 
 
 

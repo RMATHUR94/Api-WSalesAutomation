@@ -1,8 +1,11 @@
 // src/main/java/Pojo/LoginRes.java
 package Pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LoginRes {
     private boolean success;
     private Data data;
@@ -10,6 +13,7 @@ public class LoginRes {
     private String message;
     private int status;
     private Meta meta;
+
 
     // Getters and Setters
     public boolean isSuccess() { return success; }
